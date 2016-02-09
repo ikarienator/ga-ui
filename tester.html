@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,minimal-ui"/>
+  <title>GA Tester</title>
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/bootstrap-theme.css" rel="stylesheet">
+  <link href="css/reset4.css" rel="stylesheet">
+  <style>
+    textarea {
+      font-family: monospace;
+    }
+
+    .scroller {
+      width: 100%;
+      height: 800px;
+      display: flex;
+    }
+
+    .viewport {
+      width: 800px;
+      overflow: auto;
+      text-align: center;
+      cursor: crosshair;
+    }
+
+    .toolbox {
+      flex: 1;
+      overflow-y: scroll;
+    }
+
+    .piece {
+      display: inline-block;
+      margin: 5px;
+      border: 1px solid grey;
+      font-family: monospace;
+      text-align: center;
+      overflow: visible;
+      border-radius: 3px;
+      box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+      /* disable text selection */
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      cursor: pointer;
+    }
+
+    .piece:focus {
+      background: rgba(200, 200, 255, 0.2);
+    }
+
+    .piece.used {
+      tab-index: -1;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    输入文件:
+    <textarea style="width: 100%; height: 10em;" id="spec">100 100
+10 40
+10 40
+10 40
+10 40</textarea>
+    <div class="text-right">
+      <button id="update-button">更新</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="scroller">
+      <div class="viewport">
+        <canvas style="width: 1000px; height: 1000px; background: #F5F5DC" id="main-canvas">
+
+        </canvas>
+      </div>
+      <div class="toolbox" id="toolbox">
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<script src="doc.js"></script>
+<script src="command.js"></script>
+<script src="main.js"></script>
+</html>
