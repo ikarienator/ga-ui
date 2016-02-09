@@ -8,28 +8,34 @@
 
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/bootstrap-theme.css" rel="stylesheet">
-  <link href="css/reset4.css" rel="stylesheet">
   <style>
     textarea {
       font-family: monospace;
     }
 
-    .scroller {
-      width: 100%;
-      height: 800px;
-      display: flex;
-    }
-
     .viewport {
-      width: 800px;
+      flex: 1;
       overflow: auto;
       text-align: center;
       cursor: crosshair;
+      background: #F5F5EC;
+    }
+
+    .toolbox-panel {
+      width: 250px;
     }
 
     .toolbox {
+      overflow-y: auto;
       flex: 1;
-      overflow-y: scroll;
+    }
+
+    #spec {
+      margin-bottom: 7px;
+    }
+
+    #spec-pane {
+      padding: 7px;
     }
 
     .piece {
@@ -57,29 +63,46 @@
     }
   </style>
 </head>
-<body>
-<div class="container">
-  <div class="row">
-    输入文件:
-    <textarea style="width: 100%; height: 10em;" id="spec">100 100
-10 40
-10 40
-10 40
-10 40</textarea>
-    <div class="text-right">
-      <button id="update-button">更新</button>
+<body style="position: static; display: flex;">
+<div class="container"
+     style="flex: 1; display: flex; flex-direction: column; top:0; left:0; right: 0;bottom: 0; position: absolute; width: auto; height: auto; margin: 10px;">
+  <div class="btn-toolbar" style="margin-bottom: 7px;">
+    <div class="btn-group">
+      <button id="undo-button" type="button" class="btn btn-default"><span
+          class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> 撤销
+      </button>
+      <button id="redo-button" type="button" class="btn btn-default"><span
+          class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> 重做
+      </button>
+    </div>
+    <div class="btn-group">
+      <button id="reset-button" type="button" class="btn btn-danger"><span
+          class="glyphicon glyphicon-trash" aria-hidden="true"></span> 重置
+      </button>
     </div>
   </div>
-
-  <div class="row">
-    <div class="scroller">
-      <div class="viewport">
-        <canvas style="width: 1000px; height: 1000px; background: #F5F5DC" id="main-canvas">
-
-        </canvas>
+  <h3 class="row">总分: <span id="score"></span></h3>
+  <div class="row" style="flex: 1; display: flex; flex-direction: row; min-height: 0">
+    <div class="toolbox-panel" style="display: flex; flex-direction: column">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#toolbox" data-toggle="tab">工具箱</a></li>
+        <li><a href="#spec-pane" data-toggle="tab">输入文件</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="toolbox tab-pane active" id="toolbox">
+        </div>
+        <div class="tab-pane" id="spec-pane" style="display: flex; flex-direction: column">
+          <textarea style="height: 10em;" id="spec"></textarea>
+          <div class="text-right">
+            <button id="update-button" class="btn btn-default">更新</button>
+          </div>
+        </div>
       </div>
-      <div class="toolbox" id="toolbox">
-      </div>
+    </div>
+    <div class="viewport">
+      <canvas style="width: 1000px; height: 1000px;" id="main-canvas">
+
+      </canvas>
     </div>
   </div>
 </div>
@@ -88,6 +111,7 @@
 <script src="js/bootstrap.min.js"></script>
 
 <script src="doc.js"></script>
-<script src="command.js"></script>
+<script src="commands/create.js"></script>
+<script src="commands/reset.js"></script>
 <script src="main.js"></script>
 </html>

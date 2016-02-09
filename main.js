@@ -1,5 +1,5 @@
 var BOX_SIZE = 1;
-var MARGIN = {left: 35, right: 35, top: 35, bottom: 35};
+var MARGIN = {left: 0, right: 0, top: 35, bottom: 0};
 var DOC = null;
 $(function () {
   var W = 1000, H = 1000;
@@ -12,17 +12,20 @@ $(function () {
   var command = null;
 
   function prepare() {
+
     var specTa = $("#spec"), pl = [], spec = localStorage.getItem("ga-spec");
 
-    if (spec) {
-      specTa.val(spec);
-    } else {
+    if (!spec) {
+      if (!specTa.val()) {
+        specTa.val("100 100\n10 40\n10 40\n10 40\n10 40\n")
+      }
       spec = specTa.val();
       localStorage.setItem("ga-spec", spec);
     }
+    specTa.val(spec);
 
     if (localStorage.getItem("ga-map")) {
-      pl = JSON.parse(localStorage.getItem("ga-map"));
+      pl = JSON.parse(localStorage.getItem("ga-map")) || [];
     } else {
       localStorage.setItem("ga-map", "[]");
     }
@@ -40,9 +43,12 @@ $(function () {
 
     DOC = new Doc(W, H, BOX_SIZE, MARGIN, pieces);
     DOC.placement = pl;
-  }
+    DOC.updateToolbox = updateToolbox;
 
-  prepare();
+    updateSize();
+    updateToolbox();
+    render();
+  }
 
   function updateSize() {
     var canvas = $("#main-canvas");
@@ -66,6 +72,13 @@ $(function () {
       div.css({lineHeight: child[1] / 2 + 'px'});
       div.addClass("piece");
       div.attr("tabIndex", "0");
+      if (DOC.placement.some(function (pl) {
+            return pl[4] == i;
+          })) {
+        div.attr("data-disabled", "true");
+        div.removeAttr("tabIndex");
+        div.css({opacity: 0.5});
+      }
       div.click(function () {
         if (div.attr("data-disabled") === "true") {
           return;
@@ -94,11 +107,9 @@ $(function () {
     } finally {
       ctx.restore();
     }
-  }
 
-  $(window).resize(updateSize);
-  updateToolbox();
-  updateSize();
+    $("#score").text(DOC.totalScore.toFixed(1));
+  }
 
   $(cvs).mousemove(function (e) {
     var x = e.offsetX - 1;
@@ -147,7 +158,7 @@ $(function () {
   });
 
 
-  $(document).keydown(function (e) {
+  document.addEventListener('keydown', function (e) {
     if (e.metaKey && !e.shiftKey && e.keyCode == 90) {
       DOC.undo();
       e.preventDefault();
@@ -160,9 +171,35 @@ $(function () {
       }
     }
     render();
-  });
+  }, true);
 
   $("#update-button").click(function () {
-    confirm("更新输入文件将清空现有方案，确认？")
+    if (confirm("更新输入文件将清空现有方案，确认？")) {
+      localStorage.removeItem("ga-spec");
+      localStorage.removeItem("ga-map");
+      prepare();
+    }
   });
+
+  $("#undo-button").click(function () {
+    command = null;
+    DOC.undo();
+    render();
+  });
+
+  $("#redo-button").click(function () {
+    command = null;
+    DOC.redo();
+    render();
+  });
+
+  $("#reset-button").click(function () {
+    command = null;
+    DOC.exec(new ResetCommand(DOC));
+    render();
+  });
+
+  $(window).resize(updateSize);
+
+  prepare();
 });

@@ -67,27 +67,56 @@ CreateCommand.prototype = {
   },
 
   keydown: function (e) {
-    switch (e.keyCode) {
-      case 27:
-        e.preventDefault();
-        return false;
-      case 32:
-        e.preventDefault();
-        this.isTypeA = !this.isTypeA;
-        break;
-      case 189: // -
-        if (this.scale > this.scaleMin) {
-          this.scale--;
-        }
-        break;
-      case 187: // +
-        if (this.scale < this.scaleMax) {
-          this.scale++;
-        }
-        break;
-      default:
-        return;
-    }
+    if (e.key) { // firefox
+      switch (e.key) {
+        case '-': // -
+          if (this.scale > this.scaleMin) {
+            this.scale--;
+          }
+          e.preventDefault();
+
+          return;
+        case "=": // +
+          if (this.scale < this.scaleMax) {
+            this.scale++;
+          }
+          e.preventDefault();
+          return;
+        default:
+          switch (e.which || e.keyCode) {
+            case 27:
+              e.preventDefault();
+              return false;
+            case 32:
+              e.preventDefault();
+              this.isTypeA = !this.isTypeA;
+              break;
+          }
+      }
+    } else
+      switch (e.which || e.keyCode) {
+        case 27:
+          e.preventDefault();
+          return false;
+        case 32:
+          e.preventDefault();
+          this.isTypeA = !this.isTypeA;
+          break;
+        case 189: // -
+          if (this.scale > this.scaleMin) {
+            this.scale--;
+          }
+          e.preventDefault();
+          break;
+        case 187: // +
+          if (this.scale < this.scaleMax) {
+            this.scale++;
+          }
+          e.preventDefault();
+          break;
+        default:
+          return;
+      }
   },
 
   exec: function () {

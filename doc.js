@@ -7,6 +7,7 @@ function Doc(w, h, scale, margin, pieces) {
   this.placement = [];
   this.commandStack = [];
   this.redoStack = [];
+  this.totalScore = 0;
 }
 
 function cross(x1, y1, x2, y2) {
@@ -55,7 +56,7 @@ Doc.prototype = {
         ctx.textBaseline = "bottom";
         ctx.fillText("(" + (placement[2] / 10) + ", " + (placement[3] / 10) + ")", placement[2] * scale - 1, placement[3] * scale - 2);
       });
-      var totalScore = 0;
+      this.totalScore = 0;
       for (var i = 0; i < this.placement.length; i++) {
         for (var j = i + 1; j < this.placement.length; j++) {
           var p1 = this.placement[i];
@@ -80,15 +81,10 @@ Doc.prototype = {
             ctx.font = "12px 'Helvetica Neue'";
             ctx.strokeText(score, (l + r) / 2, (t + b) / 2);
             ctx.fillText(score, (l + r) / 2, (t + b) / 2);
-            totalScore += score;
+            this.totalScore += score;
           }
         }
       }
-      ctx.textAlign = "left";
-      ctx.textBaseline = "bottom";
-      ctx.fillStyle = "black";
-      ctx.font = "12px 'Helvetica Neue'";
-      ctx.fillText("总分: " + totalScore.toFixed(1), 0, -1);
     } finally {
       ctx.restore();
     }
@@ -193,6 +189,7 @@ Doc.prototype = {
     cmd.exec();
     this.commandStack.push(cmd);
     this.redoStack = [];
+    localStorage.setItem("ga-map", JSON.stringify(this.placement));
   },
 
   undo: function () {
@@ -200,6 +197,7 @@ Doc.prototype = {
       var cmd = this.commandStack.pop();
       this.redoStack.push(cmd);
       cmd.undo();
+      localStorage.setItem("ga-map", JSON.stringify(this.placement));
     }
   },
 
@@ -208,6 +206,7 @@ Doc.prototype = {
       var cmd = this.redoStack.pop();
       cmd.exec();
       this.commandStack.push(cmd);
+      localStorage.setItem("ga-map", JSON.stringify(this.placement));
     }
   }
 };
