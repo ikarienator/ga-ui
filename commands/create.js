@@ -33,12 +33,15 @@ CreateCommand.prototype = {
   },
 
   render: function (ctx) {
+
+    var x = this.x;
+    var y = this.y;
     var p = this.adjust(this.x, this.y);
-    if (p == null) {
-      return;
+    if (p) {
+      var x = p[0];
+      var y = p[1];
+
     }
-    var x = p[0];
-    var y = p[1];
     var doc = this.doc;
     var scale = doc.scale;
     var pw = (this.isTypeA ? this.piece[0] : this.piece[1]) * this.scale;
@@ -48,7 +51,7 @@ CreateCommand.prototype = {
     ctx.lineWidth = 1;
     ctx.fillStyle = this.isTypeA ? "rgba(0,0,255,0.1)" : "rgba(0,128,0,0.1)";
     ctx.fillRect((x - pw / 2) * scale, (y - ph / 2) * scale, pw * scale, ph * scale);
-    ctx.strokeStyle = x >= 0 ? this.isTypeA ? "#00F" : "#0A0" : "#F00";
+    ctx.strokeStyle = p ? this.isTypeA ? "#00F" : "#0A0" : "#F00";
     ctx.strokeRect((x - pw / 2) * scale + 0.5, (y - ph / 2) * scale + 0.5, pw * scale - 1, ph * scale - 1);
 
     ctx.font = "12px 'Helvetica Neue'";
