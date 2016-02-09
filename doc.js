@@ -265,7 +265,7 @@ Doc.prototype = {
 
   resultString: function () {
     var numbers = Array.apply(null, new Array(this.pieces.length)).map(function () {
-      return [-1, -1, -1, -1];
+      return [-10, -10, -10, -10];
     });
     this.placement.forEach(function (p) {
       numbers[p[4]] = p.slice(0, 4);
