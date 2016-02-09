@@ -2,7 +2,7 @@
 
 $(function () {
   var BOX_SIZE = 1;
-  var MARGIN = {left: 35, right: 35, top: 35, bottom: 35};
+  var MARGIN = {left: 40, right: 40, top: 35, bottom: 35};
 
   /**
    *

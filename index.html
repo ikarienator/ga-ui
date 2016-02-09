@@ -17,10 +17,16 @@
 
     .viewport {
       flex: 1;
-      overflow: auto;
       text-align: center;
       cursor: crosshair;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scroller {
       background: #F5F5EC;
+      flex: 1;
+      overflow: auto;
     }
 
     .toolbox-panel {
@@ -63,19 +69,6 @@
 <body style="position: static; display: flex;">
 <div class="container"
      style="flex: 1; display: flex; flex-direction: column; top:0; left:0; right: 0;bottom: 0; position: absolute; width: auto; height: auto; margin: 10px;">
-  <div class="btn-toolbar" style="margin-bottom: 7px;">
-    <div class="btn-group">
-      <button id="undo-button" type="button" class="btn btn-default">撤销
-      </button>
-      <button id="redo-button" type="button" class="btn btn-default">重做
-      </button>
-    </div>
-    <div class="btn-group">
-      <button id="reset-button" type="button" class="btn btn-danger">重置
-      </button>
-    </div>
-  </div>
-  <h3 class="row">总分: <span id="score"></span></h3>
 
   <div class="row" style="flex: 1; display: flex; flex-direction: row; min-height: 0">
     <div class="toolbox-panel" style="display: flex; flex-direction: column;">
@@ -90,12 +83,14 @@
         </div>
         <div class="tab-pane" id="spec-pane">
           <textarea id="spec"></textarea>
+
           <div class="text-right">
             <button id="update-button" class="btn btn-default">更新</button>
           </div>
         </div>
         <div class="tab-pane" id="output-pane">
           <textarea id="output"></textarea>
+
           <div class="text-right">
             <button id="update-map-button" class="btn btn-default">更新</button>
           </div>
@@ -103,9 +98,23 @@
       </div>
     </div>
     <div class="viewport">
-      <canvas style="width: 1000px; height: 1000px;" id="main-canvas">
+      <div class="btn-toolbar" style="margin-bottom: 7px;">
+        <div class="btn-group">
+          <button id="undo-button" type="button" class="btn btn-default">撤销
+          </button>
+          <button id="redo-button" type="button" class="btn btn-default">重做
+          </button>
+        </div>
+        <div class="btn-group">
+          <button id="reset-button" type="button" class="btn btn-danger">重置
+          </button>
+        </div>
+      </div>
+      <h3 style="margin:7px; position:absolute;">总分: <span id="score"></span></h3>
 
-      </canvas>
+      <div class="scroller">
+        <canvas style="width: 1000px; height: 1000px;" id="main-canvas"></canvas>
+      </div>
     </div>
   </div>
 </div>
