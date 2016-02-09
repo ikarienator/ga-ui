@@ -28,12 +28,7 @@
     }
 
     .toolbox {
-      overflow-y: auto;
       flex: 1;
-    }
-
-    #spec {
-      margin-bottom: 7px;
     }
 
     #spec-pane, #output-pane {
@@ -90,7 +85,7 @@
         <li><a href="#output-pane" data-toggle="tab">输出文件</a></li>
       </ul>
       <div class="tab-content"
-           style="display: flex; flex-direction: column; justify-content: flex-start">
+           style="display: flex; flex-direction: column; justify-content: flex-start; overflow: auto">
         <div class="toolbox tab-pane active" id="toolbox">
         </div>
         <div class="tab-pane" id="spec-pane">
