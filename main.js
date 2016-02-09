@@ -59,8 +59,9 @@ $(function () {
 
   function updateSize() {
     var canvas = $("#main-canvas");
-    var vpw = viewport.width();
-    var vph = viewport.height();
+    var scroller = $(".scroller");
+    var vpw = scroller.width() - 35;
+    var vph = scroller.height() - 35;
     var w = Math.max(W * BOX_SIZE, vpw);
     var h = Math.max(H * BOX_SIZE + 35, vph);
     MARGIN.left = (w - W * BOX_SIZE) / 2;
@@ -154,15 +155,16 @@ $(function () {
   $(window).resize(updateSize);
 
   $("#submit-button").click(function () {
+    var score = DOC.totalScore;
     $.get("/train/heredity/check", {
       "output": JSON.stringify(DOC.resultJSON()),
       "md6": DOC.md6(),
-      "points": DOC.totalScore,
+      "points": score,
       "username": ql_user
-    }).done(function (data) {
-      alert("success");
-    }).fail(function (data) {
-      alert("fail");
+    }).done(function () {
+      alert("提交成功! 得分: " + score);
+    }).fail(function () {
+      alert("提交失败!");
     });
   });
 
