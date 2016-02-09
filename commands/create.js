@@ -1,6 +1,12 @@
+"use strict";
+
 function gcd(a, b) {
-  if (a === 0) return b;
-  if (b === 0) return a;
+  if (a === 0) {
+    return b;
+  }
+  if (b === 0) {
+    return a;
+  }
   return gcd(b, a % b);
 }
 
@@ -21,10 +27,8 @@ function CreateCommand(doc, piece, pieceIndex, jq) {
 }
 
 CreateCommand.prototype = {
-  render: function (cursor, ctx) {
+  mousemove: function (e, cursor) {
     var doc = this.doc;
-    var scale = doc.scale;
-    ctx.fillStyle = this.isTypeA ? "rgba(0,0,255,0.1)" : "rgba(0,128,0,0.1)";
     var x = cursor[0];
     var y = cursor[1];
     var pw = (this.isTypeA ? this.piece[0] : this.piece[1]) * this.scale;
@@ -40,12 +44,21 @@ CreateCommand.prototype = {
       this.x = x;
       this.y = y;
     }
-    if (x < 0) {
-      return;
-    }
-    ctx.transform(1, 0, 0, 1, doc.margin.left, doc.margin.top);
+  },
+
+  render: function (ctx) {
+    var x = this.x;
+    var y = this.y;
+    var doc = this.doc;
+    var scale = doc.scale;
+    var pw = (this.isTypeA ? this.piece[0] : this.piece[1]) * this.scale;
+    var ph = (this.isTypeA ? this.piece[1] : this.piece[0]) * this.scale;
+
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.fillStyle = this.isTypeA ? "rgba(0,0,255,0.1)" : "rgba(0,128,0,0.1)";
     ctx.fillRect((x - pw / 2) * scale, (y - ph / 2) * scale, pw * scale, ph * scale);
-    ctx.strokeStyle = p ? this.isTypeA ? "#00F" : "#0A0" : "#F00";
+    ctx.strokeStyle = x >= 0 ? this.isTypeA ? "#00F" : "#0A0" : "#F00";
     ctx.strokeRect((x - pw / 2) * scale + 0.5, (y - ph / 2) * scale + 0.5, pw * scale - 1, ph * scale - 1);
 
     ctx.font = "12px 'Helvetica Neue'";
@@ -59,6 +72,7 @@ CreateCommand.prototype = {
     ctx.textAlign = "left";
     ctx.textBaseline = "bottom";
     ctx.fillText("按加号放大、减号缩小、空格旋转。", 70, -1);
+    ctx.restore();
   },
 
   mousedown: function (e, cursor) {
@@ -93,7 +107,7 @@ CreateCommand.prototype = {
               break;
           }
       }
-    } else
+    } else {
       switch (e.which || e.keyCode) {
         case 27:
           e.preventDefault();
@@ -117,6 +131,7 @@ CreateCommand.prototype = {
         default:
           return;
       }
+    }
   },
 
   exec: function () {

@@ -1,15 +1,20 @@
-var BOX_SIZE = 1;
-var MARGIN = {left: 0, right: 0, top: 35, bottom: 0};
-var DOC = null;
+"use strict";
+
 $(function () {
+  var BOX_SIZE = 1;
+  var MARGIN = {left: 0, right: 0, top: 35, bottom: 0};
+
+  /**
+   *
+   * @type {Doc}
+   */
+  var DOC = null;
+
   var W = 1000, H = 1000;
   var pieces = [[100, 400], [100, 400], [100, 400], [100, 400]];
   var cvs = $("#main-canvas")[0];
   var ctx = cvs.getContext("2d");
-  var toolbox = $("#toolbox");
   var cursor = [0, 0];
-
-  var command = null;
 
   function prepare() {
 
@@ -43,10 +48,9 @@ $(function () {
 
     DOC = new Doc(W, H, BOX_SIZE, MARGIN, pieces);
     DOC.placement = pl;
-    DOC.updateToolbox = updateToolbox;
 
     updateSize();
-    updateToolbox();
+    DOC.updateToolbox();
     render();
   }
 
@@ -63,52 +67,9 @@ $(function () {
     render();
   }
 
-  function updateToolbox() {
-    toolbox.children().remove();
-    pieces.forEach(function (child, i) {
-      var div = $("<div>");
-      div.width(child[0] / 2).height(child[1] / 2);
-      div.text((child[0] / 10) + 'x' + (child[1] / 10));
-      div.css({lineHeight: child[1] / 2 + 'px'});
-      div.addClass("piece");
-      div.attr("tabIndex", "0");
-      if (DOC.placement.some(function (pl) {
-            return pl[4] == i;
-          })) {
-        div.attr("data-disabled", "true");
-        div.removeAttr("tabIndex");
-        div.css({opacity: 0.5});
-      }
-      div.click(function () {
-        if (div.attr("data-disabled") === "true") {
-          return;
-        }
-        command = new CreateCommand(DOC, pieces[i], i, div);
-      });
-      toolbox.append(div);
-    });
-  }
-
 
   function render() {
-    ctx.clearRect(0, 0, W * BOX_SIZE + MARGIN.left + MARGIN.right, H * BOX_SIZE + MARGIN.top + MARGIN.bottom);
-    ctx.save();
-    try {
-      ctx.transform(1, 0, 0, 1, MARGIN.left, MARGIN.top);
-      DOC.render(ctx);
-    } finally {
-      ctx.restore();
-    }
-    ctx.save();
-    try {
-      if (command) {
-        command.render(cursor, ctx);
-      }
-    } finally {
-      ctx.restore();
-    }
-
-    $("#score").text(DOC.totalScore.toFixed(1));
+    DOC.render(ctx);
   }
 
   $(cvs).mousemove(function (e) {
@@ -118,12 +79,7 @@ $(function () {
       Math.max(0, Math.min((x - MARGIN.left) / BOX_SIZE, W)),
       Math.max(0, Math.min((y - MARGIN.top) / BOX_SIZE, H))
     ];
-    if (command && command.mousemove) {
-      if (command.mousemove(e, cursor) === false) {
-        command = null;
-      }
-    }
-    render();
+    DOC.mousemove(ctx, e, cursor);
   });
 
 
@@ -134,12 +90,7 @@ $(function () {
       Math.max(0, Math.min((x - MARGIN.left) / BOX_SIZE, W)),
       Math.max(0, Math.min((y - MARGIN.top) / BOX_SIZE, H))
     ];
-    if (command && command.mousedown) {
-      if (command.mousedown(e, cursor) === false) {
-        command = null;
-      }
-    }
-    render();
+    DOC.mousedown(ctx, e, cursor);
   });
 
   $(cvs).mouseup(function (e) {
@@ -149,28 +100,12 @@ $(function () {
       Math.max(0, Math.min((x - MARGIN.left) / BOX_SIZE, W)),
       Math.max(0, Math.min((y - MARGIN.top) / BOX_SIZE, H))
     ];
-    if (command && command.mouseup) {
-      if (command.mouseup(e, cursor) === false) {
-        command = null;
-      }
-    }
-    render();
+    DOC.mouseup(ctx, e, cursor);
   });
 
 
   document.addEventListener('keydown', function (e) {
-    if (e.metaKey && !e.shiftKey && e.keyCode == 90) {
-      DOC.undo();
-      e.preventDefault();
-    } else if (e.metaKey && e.shiftKey && e.keyCode == 90) {
-      DOC.redo();
-      e.preventDefault();
-    } else if (command && command.keydown) {
-      if (command.keydown(e) === false) {
-        command = null;
-      }
-    }
-    render();
+    DOC.keydown(ctx, e);
   }, true);
 
   $("#update-button").click(function () {
@@ -181,20 +116,34 @@ $(function () {
     }
   });
 
+  $("#update-map-button").click(function () {
+    var messages = [];
+    var placement = DOC.parse($("#output").val(), messages);
+    if (!placement) {
+      alert("方案不合法:\n  " + messages.join("\n  "));
+      return;
+    }
+    if (confirm("更新输入文件将清空现有方案，确认？")) {
+      localStorage.removeItem("ga-map");
+      localStorage.setItem("ga-map", JSON.stringify(placement));
+      DOC.placement = placement;
+      DOC.commandStack = [];
+      DOC.redoStack = [];
+      render();
+    }
+  });
+
   $("#undo-button").click(function () {
-    command = null;
     DOC.undo();
     render();
   });
 
   $("#redo-button").click(function () {
-    command = null;
     DOC.redo();
     render();
   });
 
   $("#reset-button").click(function () {
-    command = null;
     DOC.exec(new ResetCommand(DOC));
     render();
   });
@@ -202,5 +151,5 @@ $(function () {
   $(window).resize(updateSize);
 
   prepare();
-  $("#output").text(DOC.resultString());
+  $("#output").val(DOC.resultString());
 });

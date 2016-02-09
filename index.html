@@ -11,6 +11,8 @@
   <style>
     textarea {
       font-family: monospace;
+      width: 100%;
+      height: 400px;
     }
 
     .viewport {
@@ -92,14 +94,18 @@
         <div class="toolbox tab-pane active" id="toolbox">
         </div>
         <div class="tab-pane" id="spec-pane">
-          <textarea style="width:100%;height: 400px;" id="spec"></textarea>
+          <textarea id="spec"></textarea>
 
           <div class="text-right">
             <button id="update-button" class="btn btn-default">更新</button>
           </div>
         </div>
         <div class="tab-pane" id="output-pane">
-          <pre id="output"></pre>
+          <textarea id="output"></textarea>
+
+          <div class="text-right">
+            <button id="update-map-button" class="btn btn-default">更新</button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,3 +1,5 @@
+"use strict";
+
 function ResetCommand(doc) {
   this.doc = doc;
 }
