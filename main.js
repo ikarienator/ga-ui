@@ -1,7 +1,7 @@
 "use strict";
 var ql_user = "ikarienator";
 $(function () {
-  var BOX_SIZE = 1;
+  var BOX_SIZE = 2;
   var MARGIN = {left: 40, right: 40, top: 35, bottom: 35};
 
   /**
@@ -53,6 +53,8 @@ $(function () {
     updateSize();
     DOC.updateToolbox();
     render();
+
+    $("#output").val(DOC.resultString());
   }
 
   var viewport = $(".viewport");
@@ -169,5 +171,4 @@ $(function () {
   });
 
   prepare();
-  $("#output").val(DOC.resultString());
 });
