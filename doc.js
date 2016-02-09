@@ -13,20 +13,16 @@ function Doc(w, h, scale, margin, pieces) {
   this.totalScore = 0;
 }
 
-function cross(x1, y1, x2, y2) {
-  return x1 * y2 - x2 * y1;
-}
-
 Doc.prototype = {
-  updateToolbox: function (toolbox) {
+  updateToolbox: function () {
     var toolbox = $("#toolbox");
     toolbox.children().remove();
     var self = this;
     this.pieces.forEach(function (child, i) {
       var div = $("<div>");
       div.width(child[0] / 2).height(child[1] / 2);
-      div.text((child[0] / 10) + 'x' + (child[1] / 10));
-      div.css({lineHeight: child[1] / 2 + 'px'});
+      div.text((child[0] / 10) + "x" + (child[1] / 10));
+      div.css({lineHeight: child[1] / 2 + "px"});
       div.addClass("piece");
       div.attr("tabIndex", "0");
       if (self.placement.some(function (pl) {
@@ -124,7 +120,7 @@ Doc.prototype = {
         ctx.fill();
         ctx.stroke();
         ctx.font = "12px 'Helvetica Neue'";
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = "black";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
         ctx.fillText("(" + (placement[0] / 10) + ", " + (placement[1] / 10) + ")", placement[0] * scale + 1, placement[1] * scale + 1);
@@ -148,7 +144,7 @@ Doc.prototype = {
             ctx.strokeStyle = p1[5] == p2[5] ? "red" : "green";
             ctx.lineWidth = 4;
             ctx.stroke();
-            var score = (r - l + b - t) / 10;
+            var score = (r - l + b - t);
             if (p1[5] == p2[5]) {
               score = -score;
             }
@@ -157,12 +153,13 @@ Doc.prototype = {
             ctx.fillStyle = "black";
             ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
             ctx.font = "12px 'Helvetica Neue'";
-            ctx.strokeText(score, (l + r) / 2, (t + b) / 2);
-            ctx.fillText(score, (l + r) / 2, (t + b) / 2);
+            ctx.strokeText((score / 10).toString(), (l + r) / 2, (t + b) / 2);
+            ctx.fillText((score / 10).toString(), (l + r) / 2, (t + b) / 2);
             this.totalScore += score;
           }
         }
       }
+      this.totalScore /= 10;
       if (this.command && this.command.render) {
         this.command.render(ctx);
       }
@@ -190,7 +187,7 @@ Doc.prototype = {
   },
 
   adjust: function (x, y, pw, ph) {
-    var intersections = [], i, j;
+    var intersections = [], i;
     var placement, pll, plr, plt, plb;
     if (this.trial(x, y, pw, ph)) {
       return [x, y]
@@ -263,7 +260,27 @@ Doc.prototype = {
     return null;
   },
 
-  resultString: function () {
+  md6: function () {
+    var hash = 0;
+
+    function add(x) {
+      hash ^= x * x;
+    }
+
+    add(this.w);
+    add(this.h);
+    add(this.pieces.length);
+    this.pieces.forEach(function (piece) {
+      add(piece[0] / 10);
+      add(piece[1] / 10);
+      add(piece[2] / 10);
+      add(piece[3] / 10);
+    });
+
+    return hash;
+  },
+
+  resultJSON: function () {
     var numbers = Array.apply(null, new Array(this.pieces.length)).map(function () {
       return [-10, -10, -10, -10];
     });
@@ -271,8 +288,16 @@ Doc.prototype = {
       numbers[p[4]] = p.slice(0, 4);
     });
     return numbers.map(function (ns) {
-      return ns.map(function(n) { return n / 10; }).join(' ');
-    }).join('\n');
+      return ns.map(function (n) {
+        return n / 10;
+      })
+    });
+  },
+
+  resultString: function () {
+    return this.resultJSON().map(function (ns) {
+      return ns.join(" ")
+    }).join("\n");
   },
 
   isLegalLoc: function (x) {
@@ -289,7 +314,7 @@ Doc.prototype = {
         lines[i] = lines[i].trim();
         var parts = lines[i].split(/\s+/);
         if (parts.length != 4 || !parts.every(function (p) {
-              return p.match(/^\d*(\.\d)?$/) && isFinite(+p);
+              return p.match(/\-1|^\d*(\.\d)?$/) && isFinite(+p);
             })) {
           messages.push("第" + (i + 1) + "行不为4个浮点数");
         }
@@ -300,7 +325,7 @@ Doc.prototype = {
             return +p * 10;
           }
         });
-        if (parts[0] == -1 && parts[1] == -1 && parts[2] == -1 && parts[3] == -1) {
+        if (parts[0] == -10 && parts[1] == -10 && parts[2] == -10 && parts[3] == -10) {
           continue;
         }
         for (var j = 0; j < 4; j++) {

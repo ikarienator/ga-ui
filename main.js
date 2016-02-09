@@ -1,5 +1,5 @@
 "use strict";
-
+var ql_user = "ikarienator";
 $(function () {
   var BOX_SIZE = 1;
   var MARGIN = {left: 40, right: 40, top: 35, bottom: 35};
@@ -55,15 +55,23 @@ $(function () {
     render();
   }
 
+  var viewport = $(".viewport");
+
   function updateSize() {
     var canvas = $("#main-canvas");
-    var w = W * BOX_SIZE + MARGIN.left + MARGIN.right;
-    var h = H * BOX_SIZE + MARGIN.top + MARGIN.bottom;
-    var r = devicePixelRatio;
+    var vpw = viewport.width();
+    var vph = viewport.height();
+    var w = Math.max(W * BOX_SIZE, vpw);
+    var h = Math.max(H * BOX_SIZE + 35, vph);
+    MARGIN.left = (w - W * BOX_SIZE) / 2;
+    MARGIN.right = (w - W * BOX_SIZE) / 2;
+    MARGIN.top = (h - H * BOX_SIZE - 35) / 2 + 35;
+    MARGIN.bottom = (h - H * BOX_SIZE) / 2;
+    var r = window.devicePixelRatio;
     cvs.width = w * r;
     cvs.height = h * r;
-    cvs.style.width = w + 'px';
-    cvs.style.height = h + 'px';
+    cvs.style.width = w + "px";
+    cvs.style.height = h + "px";
     ctx.transform(r, 0, 0, r, 0, 0);
     render();
   }
@@ -73,8 +81,7 @@ $(function () {
     DOC.render(ctx);
   }
 
-  var viewport = $(".viewport");
-  ["mousemove", "mousedown", "mouseup"].forEach(function(event) {
+  ["mousemove", "mousedown", "mouseup"].forEach(function (event) {
     viewport[event](function (e) {
       var offset = $(cvs).offset();
       var x = e.pageX - offset.left;
@@ -88,7 +95,7 @@ $(function () {
 
   });
 
-  document.addEventListener('keydown', function (e) {
+  document.addEventListener("keydown", function (e) {
     DOC.keydown(ctx, e);
   }, true);
 
@@ -132,7 +139,32 @@ $(function () {
     render();
   });
 
+  $("#update-to").find("> ul > li > a").click(function () {
+    var fileName = $(this).text();
+    $.get("inputs/" + fileName, function (text) {
+      if (confirm("更新输入文件将清空现有方案，确认？")) {
+        $("#spec").val(text);
+        localStorage.removeItem("ga-spec");
+        localStorage.removeItem("ga-map");
+        prepare();
+      }
+    }, "text")
+  });
+
   $(window).resize(updateSize);
+
+  $("#submit-button").click(function () {
+    $.get("/train/heredity/check", {
+      "output": JSON.stringify(DOC.resultJSON()),
+      "md6": DOC.md6(),
+      "points": DOC.totalScore,
+      "username": ql_user
+    }).done(function (data) {
+      alert("success");
+    }).fail(function (data) {
+      alert("fail");
+    });
+  });
 
   prepare();
   $("#output").val(DOC.resultString());

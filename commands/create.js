@@ -33,15 +33,14 @@ CreateCommand.prototype = {
   },
 
   render: function (ctx) {
-
     var x = this.x;
     var y = this.y;
     var p = this.adjust(this.x, this.y);
     if (p) {
-      var x = p[0];
-      var y = p[1];
-
+      x = p[0];
+      y = p[1];
     }
+
     var doc = this.doc;
     var scale = doc.scale;
     var pw = (this.isTypeA ? this.piece[0] : this.piece[1]) * this.scale;
@@ -55,7 +54,7 @@ CreateCommand.prototype = {
     ctx.strokeRect((x - pw / 2) * scale + 0.5, (y - ph / 2) * scale + 0.5, pw * scale - 1, ph * scale - 1);
 
     ctx.font = "12px 'Helvetica Neue'";
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = "black";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillText("(" + ((x - pw / 2) / 10) + ", " + ((y - ph / 2) / 10) + ")", (x - pw / 2) * scale + 1, (y - ph / 2) * scale + 1);
@@ -64,7 +63,7 @@ CreateCommand.prototype = {
     ctx.fillText("(" + ((x + pw / 2) / 10) + ", " + ((y + ph / 2) / 10) + ")", (x + pw / 2) * scale - 1, (y + ph / 2) * scale - 2);
     ctx.textAlign = "left";
     ctx.textBaseline = "bottom";
-    ctx.fillText("按加号放大、减号缩小、空格旋转。", 70, -1);
+    ctx.fillText("按加号放大、减号缩小、空格旋转。", 0, -1);
     ctx.restore();
   },
 
@@ -104,7 +103,7 @@ CreateCommand.prototype = {
   keydown: function (e) {
     if (e.key) { // firefox
       switch (e.key) {
-        case '-': // -
+        case "-": // -
           this.shrink();
           e.preventDefault();
 

@@ -78,13 +78,28 @@
         <li><a href="#output-pane" data-toggle="tab">输出文件</a></li>
       </ul>
       <div class="tab-content"
-           style="display: flex; flex-direction: column; justify-content: flex-start; overflow: auto">
+           style="flex:1; display: flex; flex-direction: column; justify-content: flex-start; overflow: auto">
         <div class="toolbox tab-pane active" id="toolbox">
         </div>
         <div class="tab-pane" id="spec-pane">
           <textarea id="spec"></textarea>
 
-          <div class="text-right">
+          <div class="btn-group" id="update-to">
+            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown">更新为 <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+              <li><a href="#">input1.txt</a></li>
+              <li><a href="#">input2.txt</a></li>
+              <li><a href="#">input3.txt</a></li>
+              <li><a href="#">input4.txt</a></li>
+              <li><a href="#">input5.txt</a></li>
+              <li><a href="#">input6.txt</a></li>
+              <li><a href="#">input7.txt</a></li>
+              <li><a href="#">input8.txt</a></li>
+              <li><a href="#">input9.txt</a></li>
+              <li><a href="#">input10.txt</a></li>
+            </ul>
+          </div>
+          <div class="btn-group" style="float: right">
             <button id="update-button" class="btn btn-default">更新</button>
           </div>
         </div>
@@ -92,7 +107,10 @@
           <textarea id="output"></textarea>
 
           <div class="text-right">
-            <button id="update-map-button" class="btn btn-default">更新</button>
+            <div class="btn-group">
+              <button id="update-map-button" class="btn btn-default">更新</button>
+              <button id="submit-button" class="btn btn-default">提交</button>
+            </div>
           </div>
         </div>
       </div>
