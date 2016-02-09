@@ -1,7 +1,6 @@
 "use strict";
-var ql_user = "ikarienator";
 $(function () {
-  var BOX_SIZE = 2;
+  var BOX_SIZE = 1;
   var MARGIN = {left: 40, right: 40, top: 35, bottom: 35};
 
   /**
