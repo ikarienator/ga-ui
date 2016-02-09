@@ -202,4 +202,5 @@ $(function () {
   $(window).resize(updateSize);
 
   prepare();
+  $("#output").text(DOC.resultString());
 });

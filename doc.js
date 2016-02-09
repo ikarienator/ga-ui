@@ -177,12 +177,12 @@ Doc.prototype = {
 
   resultString: function () {
     var numbers = Array.apply(null, new Array(this.pieces.length)).map(function () {
-      return [-1, -1];
+      return [-1, -1, -1, -1];
     });
     this.placement.forEach(function (p) {
       numbers[p[4]] = p.slice(0, 4);
     });
-    return [].concat.apply([], numbers).join(" ");
+    return numbers.map(function (ns) { return ns.join(' '); }).join('\n');
   },
 
   exec: function (cmd) {
@@ -190,6 +190,7 @@ Doc.prototype = {
     this.commandStack.push(cmd);
     this.redoStack = [];
     localStorage.setItem("ga-map", JSON.stringify(this.placement));
+    $("#output").text(this.resultString());
   },
 
   undo: function () {
@@ -198,6 +199,7 @@ Doc.prototype = {
       this.redoStack.push(cmd);
       cmd.undo();
       localStorage.setItem("ga-map", JSON.stringify(this.placement));
+      $("#output").text(this.resultString());
     }
   },
 
@@ -207,6 +209,7 @@ Doc.prototype = {
       cmd.exec();
       this.commandStack.push(cmd);
       localStorage.setItem("ga-map", JSON.stringify(this.placement));
+      $("#output").text(this.resultString());
     }
   }
 };
