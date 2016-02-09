@@ -22,7 +22,7 @@ $(function () {
 
     if (!spec) {
       if (!specTa.val()) {
-        specTa.val("100 100\n10 40\n10 40\n10 40\n10 40\n")
+        specTa.val("100 100\n4\n10 40\n10 40\n10 40\n10 40\n")
       }
       spec = specTa.val();
       localStorage.setItem("ga-spec", spec);
@@ -42,8 +42,9 @@ $(function () {
     W = +lines[0] * 10;
     H = +lines[1] * 10;
     pieces.length = 0;
-    for (var i = 2; i < lines.length; i += 2) {
-      pieces.push([lines[i] * 10, lines[i + 1] * 10]);
+    var len = +lines[2];
+    for (var i = 0; i < len; i++) {
+      pieces.push([lines[i * 2 + 3] * 10, lines[i * 2 + 4] * 10]);
     }
 
     DOC = new Doc(W, H, BOX_SIZE, MARGIN, pieces);
@@ -72,37 +73,20 @@ $(function () {
     DOC.render(ctx);
   }
 
-  $(cvs).mousemove(function (e) {
-    var x = e.offsetX - 1;
-    var y = e.offsetY - 1;
-    cursor = [
-      Math.max(0, Math.min((x - MARGIN.left) / BOX_SIZE, W)),
-      Math.max(0, Math.min((y - MARGIN.top) / BOX_SIZE, H))
-    ];
-    DOC.mousemove(ctx, e, cursor);
+  var viewport = $(".viewport");
+  ["mousemove", "mousedown", "mouseup"].forEach(function(event) {
+    viewport[event](function (e) {
+      var offset = $(cvs).offset();
+      var x = e.pageX - offset.left;
+      var y = e.pageY - offset.top;
+      cursor = [
+        Math.max(0, Math.min((x - MARGIN.left) / BOX_SIZE, W)),
+        Math.max(0, Math.min((y - MARGIN.top) / BOX_SIZE, H))
+      ];
+      DOC[event](ctx, e, cursor);
+    });
+
   });
-
-
-  $(cvs).mousedown(function (e) {
-    var x = e.offsetX - 1;
-    var y = e.offsetY - 1;
-    cursor = [
-      Math.max(0, Math.min((x - MARGIN.left) / BOX_SIZE, W)),
-      Math.max(0, Math.min((y - MARGIN.top) / BOX_SIZE, H))
-    ];
-    DOC.mousedown(ctx, e, cursor);
-  });
-
-  $(cvs).mouseup(function (e) {
-    var x = e.offsetX - 1;
-    var y = e.offsetY - 1;
-    cursor = [
-      Math.max(0, Math.min((x - MARGIN.left) / BOX_SIZE, W)),
-      Math.max(0, Math.min((y - MARGIN.top) / BOX_SIZE, H))
-    ];
-    DOC.mouseup(ctx, e, cursor);
-  });
-
 
   document.addEventListener('keydown', function (e) {
     DOC.keydown(ctx, e);

@@ -28,27 +28,17 @@ function CreateCommand(doc, piece, pieceIndex, jq) {
 
 CreateCommand.prototype = {
   mousemove: function (e, cursor) {
-    var doc = this.doc;
-    var x = cursor[0];
-    var y = cursor[1];
-    var pw = (this.isTypeA ? this.piece[0] : this.piece[1]) * this.scale;
-    var ph = (this.isTypeA ? this.piece[1] : this.piece[0]) * this.scale;
-    x = Math.max(pw / 2, Math.min(doc.w - pw / 2, x));
-    x = Math.round(x - pw / 2) + pw / 2;
-    y = Math.max(ph / 2, Math.min(doc.h - ph / 2, y));
-    y = Math.round(y - ph / 2) + ph / 2;
-    var p = doc.adjust(x, y, pw, ph);
-    if (p) {
-      x = p[0];
-      y = p[1];
-      this.x = x;
-      this.y = y;
-    }
+    this.x = cursor[0];
+    this.y = cursor[1];
   },
 
   render: function (ctx) {
-    var x = this.x;
-    var y = this.y;
+    var p = this.adjust(this.x, this.y);
+    if (p == null) {
+      return;
+    }
+    var x = p[0];
+    var y = p[1];
     var doc = this.doc;
     var scale = doc.scale;
     var pw = (this.isTypeA ? this.piece[0] : this.piece[1]) * this.scale;
@@ -76,24 +66,48 @@ CreateCommand.prototype = {
   },
 
   mousedown: function (e, cursor) {
+    var p = this.adjust(this.x, this.y);
+    if (p == null) {
+      return;
+    }
+    this.x = p[0];
+    this.y = p[1];
     this.doc.exec(this);
     return false;
   },
 
+  adjust: function (x, y) {
+    var doc = this.doc;
+    var pw = (this.isTypeA ? this.piece[0] : this.piece[1]) * this.scale;
+    var ph = (this.isTypeA ? this.piece[1] : this.piece[0]) * this.scale;
+    x = Math.max(pw / 2, Math.min(doc.w - pw / 2, x));
+    x = Math.round(x - pw / 2) + pw / 2;
+    y = Math.max(ph / 2, Math.min(doc.h - ph / 2, y));
+    y = Math.round(y - ph / 2) + ph / 2;
+    return doc.adjust(x, y, pw, ph);
+  },
+  shrink: function () {
+    if (this.scale > this.scaleMin) {
+      this.scale--;
+    }
+    this.adjust();
+  },
+  expand: function () {
+    if (this.scale < this.scaleMax) {
+      this.scale++;
+    }
+    this.adjust();
+  },
   keydown: function (e) {
     if (e.key) { // firefox
       switch (e.key) {
         case '-': // -
-          if (this.scale > this.scaleMin) {
-            this.scale--;
-          }
+          this.shrink();
           e.preventDefault();
 
           return;
         case "=": // +
-          if (this.scale < this.scaleMax) {
-            this.scale++;
-          }
+          this.expand();
           e.preventDefault();
           return;
         default:
@@ -117,15 +131,11 @@ CreateCommand.prototype = {
           this.isTypeA = !this.isTypeA;
           break;
         case 189: // -
-          if (this.scale > this.scaleMin) {
-            this.scale--;
-          }
+          this.shrink();
           e.preventDefault();
           break;
         case 187: // +
-          if (this.scale < this.scaleMax) {
-            this.scale++;
-          }
+          this.expand();
           e.preventDefault();
           break;
         default:
